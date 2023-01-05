@@ -1,2 +1,3 @@
-# ha-blueprints
-Home Assistant Blueprints
+# Home Assistant Blueprints
+
+Repo voor Home Assistant Blueprints
