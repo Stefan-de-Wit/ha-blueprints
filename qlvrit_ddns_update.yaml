@@ -29,6 +29,7 @@ blueprint:
 trigger:
 - platform: time_pattern
   minutes: !input inp_minutes
+
 action:
 - service: shell_command.qlvrit_ddns_update
   data:
