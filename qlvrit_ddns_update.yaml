@@ -2,33 +2,29 @@ blueprint:
   name: "QLVR-IT DDNS update"
   description: "Update IP-Adres naar QLVR-IT DDNS"
   domain: automation
-
-input:
-  inp_minutes:
-    name: "Iedere aantal minuten dat het IP-Adres geupdatet worden."
-    selector:
-      number:
-      min: 1
-      max: 60
-      unit_of_measurement: "Minuten"
-      mode: slider
-  inp_hostname:
-    name: "DDNS Hostname, alleen de naam invullen ( sterretjes vervangen: ***.ha.qlvr-it.nl)"
-    selector:
-      text:
-        multiline: false
-        suffix: ".ha.qlvr-it.nl"
-  inp_username:
-    name: "DDNS Username"
-    selector:
-      text:
-        multiline: false
-  inp_password:
-    name: "DDNS Password"
-    selector:
-      text:
-        multiline: false
-        type: password
+  input:
+    inp_minutes:
+      name: "Iedere aantal minuten dat het IP-Adres geupdatet worden."
+      selector:
+        number:
+        min: 1
+        max: 60
+        unit_of_measurement: "Minuten"
+        mode: slider
+    inp_hostname:
+      name: "DDNS Hostname, alleen de naam invullen ( sterretjes vervangen: ***.ha.qlvr-it.nl)"
+      selector:
+        text:
+          suffix: ".ha.qlvr-it.nl"
+    inp_username:
+      name: "DDNS Username"
+      selector:
+        text:
+    inp_password:
+      name: "DDNS Password"
+      selector:
+        text:
+          type: password
         
 trigger:
 - platform: time_pattern
