@@ -16,6 +16,7 @@ input:
     name: "DDNS Hostname, alleen de naam invullen ( sterretjes vervangen: ***.ha.qlvr-it.nl)"
     selector:
       text:
+        suffix: ".ha.qlvr-it.nl"
   inp_username:
     name: "DDNS Username"
     selector:
@@ -28,7 +29,7 @@ input:
         
 trigger:
 - platform: time_pattern
-  minutes: /!input inp_minutes
+  minutes: !input inp_minutes
 action:
 - service: shell_command.qlvrit_ddns_update
   data:
