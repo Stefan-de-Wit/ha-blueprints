@@ -4,7 +4,7 @@ blueprint:
   domain: automation
   input:
     inp_minutes:
-      name: "Iedere aantal minuten dat het IP-Adres geupdatet worden."
+      name: "Om welk aantal minuten moet het IP-Adres geupdatet worden?"
       selector:
         number:
           min: 1
