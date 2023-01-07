@@ -16,15 +16,18 @@ input:
     name: "DDNS Hostname, alleen de naam invullen ( sterretjes vervangen: ***.ha.qlvr-it.nl)"
     selector:
       text:
+        multiline: false
         suffix: ".ha.qlvr-it.nl"
   inp_username:
     name: "DDNS Username"
     selector:
       text:
+        multiline: false
   inp_password:
     name: "DDNS Password"
     selector:
       text:
+        multiline: false
         type: password
         
 trigger:
