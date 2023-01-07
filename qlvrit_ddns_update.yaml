@@ -1,15 +1,8 @@
 blueprint:
   name: "QLVR-IT DDNS update"
-  description: "Update IP-Adres naar QLVR-IT DDNS"
+  description: "Update IP-Adres ieder uur naar QLVR-IT DDNS"
   domain: automation
   input:
-    inp_minutes:
-      name: "Om welk aantal minuten moet het IP-Adres geupdatet worden?"
-      selector:
-        number:
-          min: 1
-          max: 59
-          unit_of_measurement: "Minuten"
     inp_hostname:
       name: "DDNS Hostname, alleen de naam invullen ( sterretjes vervangen: ***.ha.qlvr-it.nl)"
       selector:
@@ -27,7 +20,7 @@ blueprint:
         
 trigger:
   - platform: time_pattern
-    minutes: !input inp_minutes
+    hours: /1
 
 action:
   - service: shell_command.qlvrit_ddns_update
