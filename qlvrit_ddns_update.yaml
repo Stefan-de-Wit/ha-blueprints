@@ -7,10 +7,10 @@ blueprint:
       name: "Iedere aantal minuten dat het IP-Adres geupdatet worden."
       selector:
         number:
-        min: 1
-        max: 60
-        unit_of_measurement: "Minuten"
-        mode: slider
+          min: 1
+          max: 60
+          unit_of_measurement: "Minuten"
+          mode: slider
     inp_hostname:
       name: "DDNS Hostname, alleen de naam invullen ( sterretjes vervangen: ***.ha.qlvr-it.nl)"
       selector:
