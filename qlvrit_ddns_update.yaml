@@ -27,13 +27,12 @@ blueprint:
           type: password
         
 trigger:
-- platform: time_pattern
-  minutes: !input inp_minutes
+  - platform: time_pattern
+    minutes: !input inp_minutes
 
 action:
-- service: shell_command.qlvrit_ddns_update
-  data:
-    user: !input inp_username
-    pass: !input inp_password
-    hostname: !input inp_hostname
-mode: single
+  - service: shell_command.qlvrit_ddns_update
+    data:
+      user: !input inp_username
+      pass: !input inp_password
+      hostname: !input inp_hostname
