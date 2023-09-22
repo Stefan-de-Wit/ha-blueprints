@@ -1,0 +1,142 @@
+blueprint:
+  name: Motion Light Timer
+  description: >-
+    versie 1.0 - 22-09-2023
+
+    Verlichting schakelen op basis van beweging. Deze Blueprint moet gebruikt worden i.c.m. de Motion Light Automation Blueprint.
+    Deze automation zorgt ervoor dat er een timer gestart of gestopt wordt n.a.v. het inschakelen van de verlichting o.b.v. beweging
+  domain: automation
+  input:
+    motion_sensor:
+      name: Motion Sensor Occupancy
+      description: Selecteer de bewegingsmelder welke gebruikt wordt.
+      selector:
+        entity:
+          multiple: true
+          integration: mqtt
+          domain: binary_sensor
+          device_class: motion
+    target_light:
+      name: Lights
+      description: Selecteer welke lamp(en) geschakeld moeten worden
+      selector:
+        entity:
+          multiple: true
+          domain: light
+    light_timer:
+      name: Light Timer
+      description: Selecteer welke timer gebruikt wordt om de verlichting weer uit te schakelen
+      selector:
+        entity:
+          domain: timer
+    motion_enabled:
+      name: Motion enabled
+      description: Selecteer welke boolean gebruikt wordt om te bepalen of beweging aan of uit staat
+      selector:
+        entity:
+          domain: input_boolean
+  source_url: https://github.com/QLVR-IT/ha-blueprints/blob/main/motion_light_timer.yaml
+max_exceeded: silent
+trace:
+  stored_traces: 25
+
+trigger:
+  - platform: homeassistant
+    event: start
+  - platform: event
+    event_type: automation_reloaded
+  - platform: state
+    entity_id: !input target_light
+    to: "off"
+  - platform: state
+    entity_id: !input motion_sensor
+
+# --- Create variables ---------------------------------------------------------
+variables:
+  motion_sensor: !input motion_sensor
+  target_light: !input target_light
+  light_timer: !input light_timer
+  motion_enabled: !input motion_enabled
+# --- Create anchors -----------------------------------------------------------
+  anchors:
+    - &timer_start
+      alias: "Start timer hoe lang licht nog aan moet blijven"
+      service: timer.start
+      entity_id: !input light_timer
+
+    - &timer_cancel
+      alias: "Stop timer"
+      service: timer.cancel
+      entity_id: !input light_timer
+
+    # --- Create condition anchors -------------------------------------------------
+    - &condition_timer_idle
+      alias: "Licht timer tijd is verstreken"
+      condition: template
+      value_template: "{{ is_state(light_timer,'idle') }}"
+
+    - &condition_motion_enabled
+      alias: "Bewegingsdetectie is ingeschakeld"
+      condition: template
+      value_template: "{{ is_state(motion_enabled,'on') }}"
+
+    - &condition_motion_disabled
+      alias: "Bewegingsdetectie is uitgeschakeld"
+      condition: template
+      value_template: "{{ is_state(motion_enabled,'off') }}"
+
+    - &condition_occupancy_on
+      alias: "Er is beweging gedetecteerd"
+      condition: template
+      value_template: "{{ is_state(motion_sensor,'on') }}"
+
+    - &condition_occupancy_off
+      alias: "Er is geen beweging meer"
+      condition: template
+      value_template: "{{ is_state(motion_sensor,'off') }}"
+
+    - &condition_light_on
+      alias: "Het licht is aan"
+      condition: template
+      value_template: "{{ is_state(target_light,'on') }}"
+
+    - &condition_light_off
+      alias: "Het licht is uit"
+      condition: template
+      value_template: "{{ is_state(target_light,'off') }}"
+
+# --- Actions ------------------------------------------------------------------
+action:
+  - choose:
+      - alias: "Stop timer als licht of motion (handmatig) uitgeschakeld is"
+        conditions:
+          or:
+            - *condition_light_off
+            - *condition_motion_disabled
+        sequence:
+          - *timer_cancel
+
+      - alias: "Stop timer als licht aan is en motion (handmatig) uitgeschakeld is"
+        conditions:
+          - *condition_light_on
+          - *condition_motion_disabled
+        sequence:
+          - *timer_cancel
+
+      - alias: "Start timer als geen beweging meer is"
+        conditions:
+          - *condition_motion_enabled
+          - *condition_occupancy_off
+        sequence:
+          - *timer_start
+
+      - alias: "Start timer als er opnieuw beweging is"
+        conditions:
+          - *condition_motion_enabled
+          - *condition_light_on
+          - *condition_occupancy_on
+        sequence:
+          - *timer_start
+
+    default:
+      - *timer_cancel
