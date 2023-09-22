@@ -1,8 +1,9 @@
 blueprint:
   name: Motion Light Automation
   description: >-
-    Versie 1.0 
-    Verlichting schakelen op basis van beweging.
+    versie 1.0 - 22-09-2023
+
+    Verlichting schakelen op basis van beweging. Deze Blueprint moet gebruikt worden i.c.m. de Motion Light Timer Blueprint.
     De motion sensor meld occupancy naar status on bij beweging. Wanneer c.a. 1 minuut geen beweging gezien is, gaat deze weer naar off.
     Wanneer deze naar off gaat start de timer als buffer om het licht nog even aan te laten. Als er opnieuw beweging is, start de timer opnieuw.
     Middels een boolean kan ingesteld 
@@ -108,20 +109,19 @@ variables:
       condition: template
       value_template: "{{ is_state(motion_enabled,'on') }}"
 
-    - &condition_motion_disabled
-      alias: "Bewegingsdetectie is uitgeschakeld"
-      condition: template
-      value_template: "{{ is_state(motion_enabled,'off') }}"
-
     - &condition_occupancy_on
       alias: "Er is beweging gedetecteerd"
-      condition: template
-      value_template: "{{ is_state(motion_sensor,'on') }}"
+      condition: state
+      entity_id: !input motion_sensor
+      match: any  # licht aan als er minimaal 1 bewegingsmelder beweging detecteert
+      state: "on"
 
     - &condition_occupancy_off
       alias: "Er is geen beweging meer"
-      condition: template
-      value_template: "{{ is_state(motion_sensor,'off') }}"
+      condition: state
+      entity_id: !input motion_sensor
+      # geen match: any omdat alle bewegingsmelders geen beweging meer mogen zien
+      state: "off"
 
     - &condition_sleep_on
       alias: "Sleepmode is ingeschakeld"
@@ -142,16 +142,6 @@ variables:
       alias: "Er is iemand thuis"
       condition: template
       value_template: "{{ is_state(nobody_home,'off') }}"
-
-    - &condition_light_on
-      alias: "Het licht is aan"
-      condition: template
-      value_template: "{{ is_state(target_light,'on') }}"
-
-    - &condition_light_off
-      alias: "Het licht is uit"
-      condition: template
-      value_template: "{{ is_state(target_light,'off') }}"
 
 action:
   - choose:
