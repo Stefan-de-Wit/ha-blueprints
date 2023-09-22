@@ -49,6 +49,9 @@ blueprint:
         entity:
           domain: input_boolean
   source_url: https://github.com/QLVR-IT/ha-blueprints/blob/main/motion_light_automation.yaml
+max_exceeded: silent
+trace:
+  stored_traces: 25
 
 trigger:
   - platform: homeassistant
