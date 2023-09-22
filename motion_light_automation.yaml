@@ -48,7 +48,7 @@ blueprint:
       selector:
         entity:
           domain: input_boolean
-  source_url: https://github.com/QLVR-IT/ha-blueprints/blob/main/qlvrit_ddns_update.yaml
+  source_url: https://github.com/QLVR-IT/ha-blueprints/blob/main/motion_light_automation.yaml
 
 trigger:
   - platform: homeassistant
