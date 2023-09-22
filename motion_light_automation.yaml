@@ -15,6 +15,7 @@ blueprint:
       description: Selecteer de bewegingsmelder welke gebruikt wordt.
       selector:
         entity:
+          multiple: true
           integration: mqtt
           domain: binary_sensor
           device_class: motion
@@ -23,6 +24,7 @@ blueprint:
       description: Selecteer welke lamp(en) geschakeld moeten worden
       selector:
         entity:
+          multiple: true
           domain: light
     light_timer:
       name: Light Timer
