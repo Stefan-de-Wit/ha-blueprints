@@ -72,38 +72,45 @@ variables:
     # --- Create condition anchors -------------------------------------------------
     - &condition_timer_idle
       alias: "Licht timer tijd is verstreken"
-      condition: template
-      value_template: "{{ is_state(light_timer,'idle') }}"
+      condition: state
+      entity_id: !input light_timer
+      state: "idle"
 
     - &condition_motion_enabled
       alias: "Bewegingsdetectie is ingeschakeld"
-      condition: template
-      value_template: "{{ is_state(motion_enabled,'on') }}"
+      condition: state
+      entity_id: !input motion_enabled
+      state: "on"
 
     - &condition_motion_disabled
       alias: "Bewegingsdetectie is uitgeschakeld"
-      condition: template
-      value_template: "{{ is_state(motion_enabled,'off') }}"
+      condition: state
+      entity_id: !input motion_enabled
+      state: "off"
 
     - &condition_occupancy_on
       alias: "Er is beweging gedetecteerd"
-      condition: template
-      value_template: "{{ is_state(motion_sensor,'on') }}"
+      condition: state
+      entity_id: !input motion_sensor
+      state: "on"
 
     - &condition_occupancy_off
       alias: "Er is geen beweging meer"
-      condition: template
-      value_template: "{{ is_state(motion_sensor,'off') }}"
+      condition: state
+      entity_id: !input motion_sensor
+      state: "off"
 
     - &condition_light_on
       alias: "Het licht is aan"
-      condition: template
-      value_template: "{{ is_state(target_light,'on') }}"
+      condition: state
+      entity_id: !input target_light
+      state: "on"
 
     - &condition_light_off
       alias: "Het licht is uit"
-      condition: template
-      value_template: "{{ is_state(target_light,'off') }}"
+      condition: state
+      entity_id: !input target_light
+      state: "off"
 
 # --- Actions ------------------------------------------------------------------
 action:

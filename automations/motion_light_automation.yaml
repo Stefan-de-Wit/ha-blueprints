@@ -6,17 +6,16 @@ blueprint:
     Verlichting schakelen op basis van beweging. Deze Blueprint moet gebruikt worden i.c.m. de Motion Light Timer Blueprint.
     De motion sensor meld occupancy naar status on bij beweging. Wanneer c.a. 1 minuut geen beweging gezien is, gaat deze weer naar off.
     Wanneer deze naar off gaat start de timer als buffer om het licht nog even aan te laten. Als er opnieuw beweging is, start de timer opnieuw.
-    Middels een boolean kan ingesteld 
+    Middels een input_boolean kan ingesteld worden of licht wel/niet op beweging moet schakelen.
     Sensoren waarvan bekend is dat deze Blueprint mee werkt:
     - Sonoff SNZB-03
   domain: automation
   input:
     motion_sensor:
       name: Motion Sensor Occupancy
-      description: Selecteer de bewegingsmelder welke gebruikt wordt.
+      description: Selecteer de bewegingsmelder(groep) welke gebruikt wordt.
       selector:
         entity:
-          multiple: true
           integration: mqtt
           domain: binary_sensor
           device_class: motion
@@ -101,47 +100,51 @@ variables:
 # --- Create condition anchors -------------------------------------------------
     - &condition_timer_idle
       alias: "Licht timer tijd is verstreken"
-      condition: template
-      value_template: "{{ is_state(light_timer,'idle') }}"
+      condition: state
+      entity_id: !input light_timer
+      state: "idle"
 
     - &condition_motion_enabled
       alias: "Bewegingsdetectie is ingeschakeld"
-      condition: template
-      value_template: "{{ is_state(motion_enabled,'on') }}"
+      condition: state
+      entity_id: !input motion_enabled
+      state: "on"
 
     - &condition_occupancy_on
       alias: "Er is beweging gedetecteerd"
       condition: state
       entity_id: !input motion_sensor
-      match: any  # licht aan als er minimaal 1 bewegingsmelder beweging detecteert
       state: "on"
 
     - &condition_occupancy_off
       alias: "Er is geen beweging meer"
       condition: state
       entity_id: !input motion_sensor
-      # geen match: any omdat alle bewegingsmelders geen beweging meer mogen zien
       state: "off"
 
     - &condition_sleep_on
       alias: "Sleepmode is ingeschakeld"
-      condition: template
-      value_template: "{{ is_state(sleep_mode,'on') }}"
+      condition: state
+      entity_id: !input sleep_mode
+      state: "on"
 
     - &condition_sleep_off
       alias: "Sleepmode is uitgeschakeld"
-      condition: template
-      value_template: "{{ is_state(sleep_mode,'off') }}"
+      condition: state
+      entity_id: !input sleep_mode
+      state: "off"
 
     - &condition_nobody_home_on
       alias: "Er is niemand thuis"
-      condition: template
-      value_template: "{{ is_state(nobody_home,'on') }}"
+      condition: state
+      entity_id: !input nobody_home
+      state: "on"
 
     - &condition_nobody_home_off
       alias: "Er is iemand thuis"
-      condition: template
-      value_template: "{{ is_state(nobody_home,'off') }}"
+      condition: state
+      entity_id: !input nobody_home
+      state: "off"
 
 action:
   - choose:
