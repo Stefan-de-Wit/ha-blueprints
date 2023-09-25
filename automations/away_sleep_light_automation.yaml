@@ -1,0 +1,79 @@
+blueprint:
+  name: Away Sleep Light Automation
+  description: >-
+    versie 1.0 - 25-09-2023
+
+    Verlichting uitschakelen als niemand thuis en/of slaapmode geactiveerd wordt.
+  domain: automation
+  input:
+    target_light:
+      name: Lights
+      description: Selecteer welke lamp(en) uitgeschakeld moeten worden
+      selector:
+        entity:
+          multiple: true
+          domain: light
+    sleep_mode:
+      name: Sleep mode 
+      description: Selecteer welke boolean gebruikt wordt om te bepalen of de woning in slaapstand staat
+      selector:
+        entity:
+          domain: input_boolean
+    nobody_home:
+      name: Nobody home
+      description: Selecteer welke boolean gebruikt wordt om te bepalen of er niemand thuis is
+      selector:
+        entity:
+          domain: input_boolean
+  source_url: https://github.com/QLVR-IT/ha-blueprints/blob/main/away_sleep_light_automation.yaml
+max_exceeded: silent
+trace:
+  stored_traces: 25
+
+trigger:
+  - platform: state
+    entity_id:
+      - !input sleep_mode
+      - !input nobody_home
+
+# --- Create variables ---------------------------------------------------------
+variables:
+  target_light: !input target_light
+  sleep_mode: !input sleep_mode
+  nobody_home: !input nobody_home
+# --- Create anchors -----------------------------------------------------------
+  anchors:
+    - &turn_off
+      alias: "Licht uitschakelen"
+      service: light.turn_off
+      target:
+        entity_id: !input target_light
+      data:
+        transition: 3
+
+# --- Create condition anchors -------------------------------------------------
+    - &condition_sleep_on
+      alias: "Sleepmode is ingeschakeld"
+      condition: state
+      entity_id: !input sleep_mode
+      state: "on"
+
+    - &condition_nobody_home_on
+      alias: "Er is niemand thuis"
+      condition: state
+      entity_id: !input nobody_home
+      state: "on"
+
+
+action:
+  - choose:
+      - alias: "Verlichting uit wanneer slaap mode actief of niemand thuis is"
+        conditions:
+          or:
+          - *condition_sleep_on
+          - *condition_nobody_home_on
+        sequence:
+          - *turn_off
+
+    default:
+      - *turn_off
