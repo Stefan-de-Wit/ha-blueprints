@@ -15,6 +15,7 @@ blueprint:
 
     Sensoren waarvan bekend is dat deze Blueprint mee werkt:
     - Sonoff SNZB-03
+    ----------------------------------------------------------------------------------------------------------------------------------------
   domain: automation
   input:
     motion_sensor:
