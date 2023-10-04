@@ -17,6 +17,7 @@ blueprint:
 
     Sensoren waarvan bekend is dat deze Blueprint mee werkt:
     - Sonoff SNZB-03
+    ----------------------------------------------------------------------------------------------------------------------------------------
   domain: automation
   input:
     motion_sensor:
@@ -175,7 +176,6 @@ action:
       - alias: "Licht aan bij beweging en bewegingsdetectie is ingeschakeld"
         conditions:
           - *condition_motion_enabled
-          - *condition_sleep_off
           - *condition_nobody_home_off
           - *condition_occupancy_on
         sequence:
