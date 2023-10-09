@@ -1,7 +1,12 @@
 blueprint:
   name: Door sensor Light Automation
   description: >-
-    versie 1.0 - 24-09-2023
+    version 1.1 - 09-10-2023
+    - removed sleep_mode condition
+    - removed nobody_home condition
+
+    version 1.0 - 24-09-2023
+    - first version
 
     Verlichting schakelen op basis van het openen van een deursensor. Middels een input_boolean kan aangegeven worden of deze automation wel/niet actief is.
     De deursensor gaat naar status on als de deur open is en naar off als de deur dicht is.
@@ -53,10 +58,7 @@ trigger:
   - platform: event
     event_type: automation_reloaded
   - platform: state
-    entity_id:
-      - !input door_enabled
-      - !input sleep_mode
-      - !input nobody_home
+    entity_id: !input door_enabled
   - platform: state
     entity_id: !input door_sensor
 
@@ -65,8 +67,6 @@ variables:
   door_sensor: !input door_sensor
   target_light: !input target_light
   door_enabled: !input door_enabled
-  sleep_mode: !input sleep_mode
-  nobody_home: !input nobody_home
 # --- Create anchors -----------------------------------------------------------
   anchors:
     - &turn_off
@@ -100,40 +100,8 @@ variables:
       entity_id: !input door_sensor
       state: "off"
 
-    - &condition_sleep_on
-      alias: "Sleepmode is ingeschakeld"
-      condition: state
-      entity_id: !input sleep_mode
-      state: "on"
-
-    - &condition_sleep_off
-      alias: "Sleepmode is uitgeschakeld"
-      condition: state
-      entity_id: !input sleep_mode
-      state: "off"
-
-    - &condition_nobody_home_on
-      alias: "Er is niemand thuis"
-      condition: state
-      entity_id: !input nobody_home
-      state: "on"
-
-    - &condition_nobody_home_off
-      alias: "Er is iemand thuis"
-      condition: state
-      entity_id: !input nobody_home
-      state: "off"
-
 action:
   - choose:
-      - alias: "Verlichting uit wanneer slaap mode actief of niemand thuis is"
-        conditions:
-          or:
-          - *condition_sleep_on
-          - *condition_nobody_home_on
-        sequence:
-          - *turn_off
-
       - alias: "Verlichting uit wanneer deur dicht is"
         conditions:
           - *condition_door_enabled
@@ -144,8 +112,6 @@ action:
       - alias: "Licht aan als deur open is"
         conditions:
           - *condition_door_enabled
-          - *condition_sleep_off
-          - *condition_nobody_home_off
           - *condition_door_open
         sequence:
           - *turn_on
