@@ -1,0 +1,154 @@
+blueprint:
+  name: Motion Light Sleep On Automation
+  description: >-
+    version 1.0 - 09-10-2023
+    - first version
+
+    ----------------------------------------------------------------------------------------------------------------------------------------
+    Verlichting schakelen op basis van beweging. Deze Blueprint moet gebruikt worden i.c.m. de Motion Light Timer Blueprint.
+    De motion sensor meld occupancy naar status on bij beweging. Wanneer c.a. 1 minuut geen beweging gezien is, gaat deze weer naar off.
+    Wanneer deze naar off gaat start de timer als buffer om het licht nog even aan te laten. Als er opnieuw beweging is, start de timer opnieuw.
+    Middels een input_boolean kan ingesteld worden of licht wel/niet op beweging moet schakelen.
+
+    Alleen als slaapmode actief is zal bewegingsdetectie functioneren en verlichting schakelen. Als er niemand thuis is veranderd er niets.
+
+    Sensoren waarvan bekend is dat deze Blueprint mee werkt:
+    - Sonoff SNZB-03
+    ----------------------------------------------------------------------------------------------------------------------------------------
+  domain: automation
+  input:
+    motion_sensor:
+      name: Motion Sensor Occupancy
+      description: Selecteer de bewegingsmelder(groep) welke gebruikt wordt.
+      selector:
+        entity:
+          integration: mqtt
+          domain: binary_sensor
+          device_class: motion
+    target_light:
+      name: Lights
+      description: Selecteer welke lamp(en) geschakeld moeten worden
+      selector:
+        entity:
+          multiple: true
+          domain: light
+    light_timer:
+      name: Light Timer
+      description: Selecteer welke timer gebruikt wordt om de verlichting weer uit te schakelen
+      selector:
+        entity:
+          domain: timer
+    motion_enabled:
+      name: Motion enabled
+      description: Selecteer welke boolean gebruikt wordt om te bepalen of beweging aan of uit staat
+      selector:
+        entity:
+          domain: input_boolean
+    sleep_mode:
+      name: Sleep mode 
+      description: Selecteer welke boolean gebruikt wordt om te bepalen of de woning in slaapstand staat
+      selector:
+        entity:
+          domain: input_boolean
+  source_url: https://github.com/QLVR-IT/ha-blueprints/blob/main/motion_light_sleep_on_automation.yaml
+max_exceeded: silent
+trace:
+  stored_traces: 25
+
+trigger:
+  - platform: homeassistant
+    event: start
+  - platform: event
+    event_type: automation_reloaded
+  - platform: state
+    entity_id:
+      - !input motion_enabled
+      - !input sleep_mode
+  - platform: state
+    entity_id: !input motion_sensor
+    to: "on"
+  - platform: event
+    event_type: timer.finished
+    event_data:
+      entity_id: !input light_timer
+
+# --- Create variables ---------------------------------------------------------
+variables:
+  motion_sensor: !input motion_sensor
+  target_light: !input target_light
+  light_timer: !input light_timer
+  motion_enabled: !input motion_enabled
+  sleep_mode: !input sleep_mode
+# --- Create anchors -----------------------------------------------------------
+  anchors:
+    - &turn_off
+      alias: "Licht uitschakelen"
+      service: light.turn_off
+      target:
+        entity_id: !input target_light
+      data:
+        transition: 3
+
+    - &turn_on
+      alias: "Licht inschakelen"
+      service: light.turn_on
+      target:
+        entity_id: !input target_light
+
+# --- Create condition anchors -------------------------------------------------
+    - &condition_timer_idle
+      alias: "Licht timer tijd is verstreken"
+      condition: state
+      entity_id: !input light_timer
+      state: "idle"
+
+    - &condition_motion_enabled
+      alias: "Bewegingsdetectie is ingeschakeld"
+      condition: state
+      entity_id: !input motion_enabled
+      state: "on"
+
+    - &condition_occupancy_on
+      alias: "Er is beweging gedetecteerd"
+      condition: state
+      entity_id: !input motion_sensor
+      state: "on"
+
+    - &condition_occupancy_off
+      alias: "Er is geen beweging meer"
+      condition: state
+      entity_id: !input motion_sensor
+      state: "off"
+
+    - &condition_sleep_on
+      alias: "Sleepmode is ingeschakeld"
+      condition: state
+      entity_id: !input sleep_mode
+      state: "on"
+
+    - &condition_sleep_off
+      alias: "Sleepmode is uitgeschakeld"
+      condition: state
+      entity_id: !input sleep_mode
+      state: "off"
+
+action:
+  - choose:
+      - alias: "Verlichting uit wanneer timer afgelopen is"
+        conditions:
+          - *condition_timer_idle
+          - *condition_motion_enabled
+          - *condition_occupancy_off
+        sequence:
+          - *turn_off
+
+      - alias: "Licht aan bij beweging en bewegingsdetectie is ingeschakeld"
+        conditions:
+          - *condition_motion_enabled
+          - *condition_sleep_on
+          - *condition_occupancy_on
+        sequence:
+          - *turn_on
+
+    default:
+      - *turn_off
