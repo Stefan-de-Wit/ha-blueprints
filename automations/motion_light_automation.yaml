@@ -60,10 +60,7 @@ trigger:
   - platform: event
     event_type: automation_reloaded
   - platform: state
-    entity_id:
-      - !input motion_enabled
-      - !input sleep_mode
-      - !input nobody_home
+    entity_id: !input motion_enabled
   - platform: state
     entity_id: !input motion_sensor
     to: "on"
