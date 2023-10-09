@@ -1,0 +1,62 @@
+blueprint:
+  name: Sleep Light Automation
+  description: >-
+    version 1.0 - 09-10-2023
+    - first version
+
+    Verlichting uitschakelen als slaapmode geactiveerd wordt.
+  domain: automation
+  input:
+    target_light:
+      name: Lights
+      description: Selecteer welke lamp(en) uitgeschakeld moeten worden
+      selector:
+        entity:
+          multiple: true
+          domain: light
+    sleep_mode:
+      name: Sleep mode 
+      description: Selecteer welke boolean gebruikt wordt om te bepalen of de woning in slaapstand staat
+      selector:
+        entity:
+          domain: input_boolean
+  source_url: https://github.com/QLVR-IT/ha-blueprints/blob/main/sleep_light_automation.yaml
+max_exceeded: silent
+trace:
+  stored_traces: 25
+
+trigger:
+  - platform: state
+    entity_id: !input sleep_mode
+
+# --- Create variables ---------------------------------------------------------
+variables:
+  target_light: !input target_light
+  sleep_mode: !input sleep_mode
+# --- Create anchors -----------------------------------------------------------
+  anchors:
+    - &turn_off
+      alias: "Licht uitschakelen"
+      service: light.turn_off
+      target:
+        entity_id: !input target_light
+      data:
+        transition: 3
+
+# --- Create condition anchors -------------------------------------------------
+    - &condition_sleep_on
+      alias: "Sleepmode is ingeschakeld"
+      condition: state
+      entity_id: !input sleep_mode
+      state: "on"
+
+action:
+  - choose:
+      - alias: "Verlichting uit wanneer slaap mode actief wordt"
+        conditions:
+          - *condition_sleep_on
+        sequence:
+          - *turn_off
+
+    default:
+      - *turn_off
