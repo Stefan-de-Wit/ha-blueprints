@@ -10,7 +10,7 @@ blueprint:
     Wanneer deze naar off gaat start de timer als buffer om het licht nog even aan te laten. Als er opnieuw beweging is, start de timer opnieuw.
     Middels een input_boolean kan ingesteld worden of licht wel/niet op beweging moet schakelen.
 
-    Als er niemand thuis is en/of slaapmode actief zal bewegingsdetectie uitgeschakeld worden en zullen de lampen ook uit gaan.
+    Als er niemand thuis is zal bewegingsdetectie uitgeschakeld worden en zullen de lampen ook uit gaan.
 
     Sensoren waarvan bekend is dat deze Blueprint mee werkt:
     - Sonoff SNZB-03
