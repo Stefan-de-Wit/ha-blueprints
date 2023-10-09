@@ -3,7 +3,6 @@ blueprint:
   description: >-
     version 1.0 - 09-10-2023
     - first version
-    - basicly a copy of motion_light_automation version 1.0
 
     ----------------------------------------------------------------------------------------------------------------------------------------
     Verlichting schakelen op basis van beweging. Deze Blueprint moet gebruikt worden i.c.m. de Motion Light Timer Blueprint.
@@ -11,7 +10,7 @@ blueprint:
     Wanneer deze naar off gaat start de timer als buffer om het licht nog even aan te laten. Als er opnieuw beweging is, start de timer opnieuw.
     Middels een input_boolean kan ingesteld worden of licht wel/niet op beweging moet schakelen.
 
-    Als er slaapmode actief zal bewegingsdetectie uitgeschakeld worden en zullen de lampen ook uit gaan. Bewegingsdetectie en lampen blijven wel werken als er niemand thuis is.
+    Als er niemand thuis is en/of slaapmode actief zal bewegingsdetectie uitgeschakeld worden en zullen de lampen ook uit gaan.
 
     Sensoren waarvan bekend is dat deze Blueprint mee werkt:
     - Sonoff SNZB-03
