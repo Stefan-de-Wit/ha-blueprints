@@ -35,18 +35,6 @@ blueprint:
       selector:
         entity:
           domain: input_boolean
-    sleep_mode:
-      name: Sleep mode 
-      description: Selecteer welke boolean gebruikt wordt om te bepalen of de woning in slaapstand staat
-      selector:
-        entity:
-          domain: input_boolean
-    nobody_home:
-      name: Nobody home
-      description: Selecteer welke boolean gebruikt wordt om te bepalen of er niemand thuis is
-      selector:
-        entity:
-          domain: input_boolean
   source_url: https://github.com/QLVR-IT/ha-blueprints/blob/main/automations/door_sensor_light_automation.yaml
 max_exceeded: silent
 trace:
