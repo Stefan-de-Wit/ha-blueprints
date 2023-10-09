@@ -1,6 +1,9 @@
 blueprint:
   name: Motion Light Automation
   description: >-
+    version 1.2 - 09-10-2023
+    - removed sleep_mode and nobody_home conditions
+    
     version 1.1 - 04-10-2023
     - removed condition_sleep_off for turning on light
     
@@ -13,7 +16,7 @@ blueprint:
     Wanneer deze naar off gaat start de timer als buffer om het licht nog even aan te laten. Als er opnieuw beweging is, start de timer opnieuw.
     Middels een input_boolean kan ingesteld worden of licht wel/niet op beweging moet schakelen.
 
-    Als er niemand thuis is zal bewegingsdetectie uitgeschakeld worden en zullen de lampen ook uit gaan. Als slaapmode actief is blijven bewegingsmelders de verlichting schakelen.
+    Als bewegingsdetectie ingeschakeld is werkt dit en het schakelen van de verlichting  altijd (ook als sleepmode of nobody_home actief is).
 
     Sensoren waarvan bekend is dat deze Blueprint mee werkt:
     - Sonoff SNZB-03
@@ -25,7 +28,6 @@ blueprint:
       description: Selecteer de bewegingsmelder(groep) welke gebruikt wordt.
       selector:
         entity:
-          integration: mqtt
           domain: binary_sensor
           device_class: motion
     target_light:
@@ -44,18 +46,6 @@ blueprint:
     motion_enabled:
       name: Motion enabled
       description: Selecteer welke boolean gebruikt wordt om te bepalen of beweging aan of uit staat
-      selector:
-        entity:
-          domain: input_boolean
-    sleep_mode:
-      name: Sleep mode 
-      description: Selecteer welke boolean gebruikt wordt om te bepalen of de woning in slaapstand staat
-      selector:
-        entity:
-          domain: input_boolean
-    nobody_home:
-      name: Nobody home
-      description: Selecteer welke boolean gebruikt wordt om te bepalen of er niemand thuis is
       selector:
         entity:
           domain: input_boolean
@@ -88,8 +78,6 @@ variables:
   target_light: !input target_light
   light_timer: !input light_timer
   motion_enabled: !input motion_enabled
-  sleep_mode: !input sleep_mode
-  nobody_home: !input nobody_home
 # --- Create anchors -----------------------------------------------------------
   anchors:
     - &turn_off
@@ -131,40 +119,8 @@ variables:
       entity_id: !input motion_sensor
       state: "off"
 
-    - &condition_sleep_on
-      alias: "Sleepmode is ingeschakeld"
-      condition: state
-      entity_id: !input sleep_mode
-      state: "on"
-
-    - &condition_sleep_off
-      alias: "Sleepmode is uitgeschakeld"
-      condition: state
-      entity_id: !input sleep_mode
-      state: "off"
-
-    - &condition_nobody_home_on
-      alias: "Er is niemand thuis"
-      condition: state
-      entity_id: !input nobody_home
-      state: "on"
-
-    - &condition_nobody_home_off
-      alias: "Er is iemand thuis"
-      condition: state
-      entity_id: !input nobody_home
-      state: "off"
-
 action:
   - choose:
-      - alias: "Verlichting uit wanneer slaap mode actief of niemand thuis is"
-        conditions:
-          or:
-          - *condition_sleep_on
-          - *condition_nobody_home_on
-        sequence:
-          - *turn_off
-
       - alias: "Verlichting uit wanneer timer afgelopen is"
         conditions:
           - *condition_timer_idle
@@ -176,7 +132,6 @@ action:
       - alias: "Licht aan bij beweging en bewegingsdetectie is ingeschakeld"
         conditions:
           - *condition_motion_enabled
-          - *condition_nobody_home_off
           - *condition_occupancy_on
         sequence:
           - *turn_on
